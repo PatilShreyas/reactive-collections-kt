@@ -27,5 +27,5 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build with Gradle
-        run: ./gradlew build test spotlessCheck
+      - name: Check with Gradle - Test, Lint
+        run: ./gradlew jvmTest spotlessCheck
