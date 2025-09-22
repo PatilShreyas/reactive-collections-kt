@@ -3,10 +3,12 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply  false
     alias(libs.plugins.vanniktech.mavenPublish) apply false
     alias(libs.plugins.spotless).apply(false)
+    alias(libs.plugins.dokka)
 }
 
 subprojects {
     apply(plugin = rootProject.libs.plugins.spotless.get().pluginId)
+    apply(plugin = rootProject.libs.plugins.dokka.get().pluginId)
 
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {
         kotlin {
