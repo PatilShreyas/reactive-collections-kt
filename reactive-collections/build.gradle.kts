@@ -74,3 +74,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
+mavenPublishing {
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
+}
