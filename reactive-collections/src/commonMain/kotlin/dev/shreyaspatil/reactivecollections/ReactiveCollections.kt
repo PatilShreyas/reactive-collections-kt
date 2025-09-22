@@ -65,22 +65,12 @@ public fun <E> Collection<E>.toMutableReactiveList(): MutableReactiveList<E> = R
 /**
  * Returns a new [MutableReactiveList] filled with all elements of this collection.
  */
-public fun <E> List<E>.toMutableReactiveList(): MutableReactiveList<E> = ReactiveListImpl(this.toMutableList())
-
-/**
- * Returns a new [MutableReactiveList] filled with all elements of this collection.
- */
 public fun <E> MutableList<E>.toMutableReactiveList(): MutableReactiveList<E> = ReactiveListImpl(this)
 
 /**
  * Returns a new [MutableReactiveSet] filled with all elements of this collection.
  */
 public fun <E> Collection<E>.toMutableReactiveSet(): MutableReactiveSet<E> = ReactiveSetImpl(this.toMutableSet())
-
-/**
- * Returns a new [MutableReactiveSet] filled with all elements of this collection.
- */
-public fun <E> Set<E>.toMutableReactiveSet(): MutableReactiveSet<E> = ReactiveSetImpl(this.toMutableSet())
 
 /**
  * Returns a new [MutableReactiveSet] filled with all elements of this collection.
