@@ -47,6 +47,16 @@ jobs:
         env:
           TAG: v${{ github.event.inputs.versionName }}
 
+      - name: Build documentation
+        id: release
+        run: ./gradlew dokkaHtml
+
+      - name: Upload documentation
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./reactive-collections/build/dokka/html
+
       - name: Create Release on GitHub
         id: create_release
         uses: actions/create-release@v1
@@ -57,16 +67,6 @@ jobs:
           release_name: v${{ github.event.inputs.versionName }}
           draft: true
           prerelease: false
-
-      - name: Build documentation
-        id: release
-        run: ./gradlew dokkaHtml
-
-      - name: Upload documentation
-        id: deployment
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./reactive-collections/build/dokka/html
 
   publish-docs:
     needs: release
