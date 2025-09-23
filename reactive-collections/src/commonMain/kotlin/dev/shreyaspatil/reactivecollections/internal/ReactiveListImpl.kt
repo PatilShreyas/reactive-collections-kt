@@ -25,32 +25,15 @@ internal class ReactiveListImpl<E>(
 ) : AbstractReactiveCollection<E, List<E>, MutableList<E>>(internalCollection, internalCollection::toList),
     MutableReactiveList<E>,
     MutableList<E> by internalCollection {
+
     override fun add(element: E): Boolean = runNotifying { add(element) }
-
-    override fun add(
-        index: Int,
-        element: E,
-    ) = runNotifying { add(index, element) }
-
-    override fun set(
-        index: Int,
-        element: E,
-    ): E = runNotifying { set(index, element) }
-
+    override fun add(index: Int, element: E) = runNotifying { add(index, element) }
+    override fun set(index: Int, element: E): E = runNotifying { set(index, element) }
     override fun addAll(elements: Collection<E>): Boolean = runNotifying { addAll(elements) }
-
-    override fun addAll(
-        index: Int,
-        elements: Collection<E>,
-    ): Boolean = runNotifying { addAll(index, elements) }
-
+    override fun addAll(index: Int, elements: Collection<E>): Boolean = runNotifying { addAll(index, elements) }
     override fun clear() = runNotifying { clear() }
-
     override fun remove(element: E): Boolean = runNotifying { remove(element) }
-
     override fun removeAt(index: Int): E = runNotifying { removeAt(index) }
-
     override fun removeAll(elements: Collection<E>): Boolean = runNotifying { removeAll(elements) }
-
     override fun retainAll(elements: Collection<E>): Boolean = runNotifying { retainAll(elements) }
 }

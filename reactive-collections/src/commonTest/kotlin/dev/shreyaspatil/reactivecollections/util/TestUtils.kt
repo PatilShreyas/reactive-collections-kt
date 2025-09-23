@@ -56,15 +56,14 @@ class FlowTester<T>(
 fun <T> testFlow(
     flow: Flow<T>,
     operations: suspend () -> Unit = {},
-): FlowTester<T> =
-    FlowTester(
-        buildList {
-            runTest(UnconfinedTestDispatcher()) {
-                flow.onEach { add(it) }.launchIn(backgroundScope)
-                operations()
-            }
-        },
-    )
+): FlowTester<T> = FlowTester(
+    buildList {
+        runTest(UnconfinedTestDispatcher()) {
+            flow.onEach { add(it) }.launchIn(backgroundScope)
+            operations()
+        }
+    },
+)
 
 /**
  * Creates a fluent test builder for reactive collections that allows you to perform operations

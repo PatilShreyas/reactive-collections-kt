@@ -15,12 +15,12 @@ subprojects {
             target("**/*.kt")
             targetExclude("$buildDir/**/*.kt")
             targetExclude("bin/**/*.kt")
-            ktlint()
+            ktlint().editorConfigOverride(mapOf("ktlint_code_style" to "intellij_idea"))
             licenseHeaderFile(rootProject.file("licenses/APACHE-2.0"))
         }
         kotlinGradle {
             target("**/*.gradle.kts")
-            ktlint()
+            ktlint().editorConfigOverride(mapOf("ktlint_code_style" to "intellij_idea"))
         }
     }
 }

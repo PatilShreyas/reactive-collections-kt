@@ -25,15 +25,11 @@ internal class ReactiveSetImpl<E>(
 ) : AbstractReactiveCollection<E, Set<E>, MutableSet<E>>(internalCollection, internalCollection::toSet),
     MutableReactiveSet<E>,
     MutableSet<E> by internalCollection {
+
     override fun add(element: E): Boolean = runNotifying { add(element) }
-
     override fun addAll(elements: Collection<E>): Boolean = runNotifying { addAll(elements) }
-
     override fun clear() = runNotifying { clear() }
-
     override fun remove(element: E): Boolean = runNotifying { remove(element) }
-
     override fun removeAll(elements: Collection<E>): Boolean = runNotifying { removeAll(elements) }
-
     override fun retainAll(elements: Collection<E>): Boolean = runNotifying { retainAll(elements) }
 }

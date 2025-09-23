@@ -72,54 +72,51 @@ class AbstractReactiveCollectionTest {
     }
 
     @Test
-    fun `batchUpdateAsync - should perform multiple operations in single emission`() =
-        runTest {
-            val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
+    fun `batchUpdateAsync - should perform multiple operations in single emission`() = runTest {
+        val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
 
-            testFlow(list.asStateFlow()) {
+        testFlow(list.asStateFlow()) {
+            list.batchUpdateAsync {
+                add("D")
+                add("E")
+                delay(1000)
+                removeAt(0) // Remove "A"
+                set(0, "Modified B") // Modify "B" to "Modified B"
+            }
+        }.emitsExactly(
+            listOf("A", "B", "C"), // Initial state
+            listOf("Modified B", "C", "D", "E"), // Final state after batch
+        )
+    }
+
+    @Test
+    fun `batchUpdateAsync - should emit only once for empty batch`() = runTest {
+        val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
+
+        testFlow(list.asStateFlow()) {
+            list.batchUpdateAsync {
+                delay(1000)
+                // Empty batch - no operations
+            }
+        }.emitsExactly(listOf("A", "B", "C"))
+    }
+
+    @Test
+    fun `batchUpdateAsync - should handle exceptions and still emit`() = runTest {
+        val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
+
+        testFlow(list.asStateFlow()) {
+            runCatching {
                 list.batchUpdateAsync {
                     add("D")
-                    add("E")
-                    delay(1000)
-                    removeAt(0) // Remove "A"
-                    set(0, "Modified B") // Modify "B" to "Modified B"
+                    removeAt(10) // This will throw IndexOutOfBoundsException
                 }
-            }.emitsExactly(
-                listOf("A", "B", "C"), // Initial state
-                listOf("Modified B", "C", "D", "E"), // Final state after batch
-            )
-        }
-
-    @Test
-    fun `batchUpdateAsync - should emit only once for empty batch`() =
-        runTest {
-            val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
-
-            testFlow(list.asStateFlow()) {
-                list.batchUpdateAsync {
-                    delay(1000)
-                    // Empty batch - no operations
-                }
-            }.emitsExactly(listOf("A", "B", "C"))
-        }
-
-    @Test
-    fun `batchUpdateAsync - should handle exceptions and still emit`() =
-        runTest {
-            val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
-
-            testFlow(list.asStateFlow()) {
-                runCatching {
-                    list.batchUpdateAsync {
-                        add("D")
-                        removeAt(10) // This will throw IndexOutOfBoundsException
-                    }
-                }.exceptionOrNull()!!.let { assertTrue { it is IndexOutOfBoundsException } }
-            }.emitsExactly(
-                listOf("A", "B", "C"), // Initial state
-                listOf("A", "B", "C", "D"), // State after successful operations before exception
-            )
-        }
+            }.exceptionOrNull()!!.let { assertTrue { it is IndexOutOfBoundsException } }
+        }.emitsExactly(
+            listOf("A", "B", "C"), // Initial state
+            listOf("A", "B", "C", "D"), // State after successful operations before exception
+        )
+    }
 
     @Test
     fun `nested batchUpdate - should work correctly`() {

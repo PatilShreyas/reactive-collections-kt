@@ -22,20 +22,12 @@ import dev.shreyaspatil.reactivecollections.core.MutableReactiveMap
  */
 internal class ReactiveMapImpl<K, V>(
     internalCollection: MutableMap<K, V>,
-) : AbstractReactiveCollection<Map.Entry<K, V>, Map<K, V>, MutableMap<K, V>>(
-        internalCollection,
-        internalCollection::toMap,
-    ),
+) : AbstractReactiveCollection<Map.Entry<K, V>, Map<K, V>, MutableMap<K, V>>(internalCollection, internalCollection::toMap),
     MutableReactiveMap<K, V>,
     MutableMap<K, V> by internalCollection {
-    override fun put(
-        key: K,
-        value: V,
-    ): V? = runNotifying { put(key, value) }
 
+    override fun put(key: K, value: V): V? = runNotifying { put(key, value) }
     override fun putAll(from: Map<out K, V>) = runNotifying { putAll(from) }
-
     override fun remove(key: K): V? = runNotifying { remove(key) }
-
     override fun clear() = runNotifying { clear() }
 }

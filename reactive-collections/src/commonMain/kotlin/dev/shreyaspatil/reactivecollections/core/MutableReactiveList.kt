@@ -70,15 +70,14 @@ public fun <E> MutableReactiveList<E>.subListAsFlow(
     fromIndex: Int,
     toIndex: Int,
     strict: Boolean = true,
-): Flow<List<E>> =
-    asStateFlow()
-        .map { list ->
-            val start = if (strict) fromIndex else fromIndex.coerceIn(0, list.size)
-            val end = if (strict) toIndex else toIndex.coerceIn(0, list.size)
+): Flow<List<E>> = asStateFlow()
+    .map { list ->
+        val start = if (strict) fromIndex else fromIndex.coerceIn(0, list.size)
+        val end = if (strict) toIndex else toIndex.coerceIn(0, list.size)
 
-            if (start in 0..end && end <= list.size) {
-                list.subList(start, end)
-            } else {
-                emptyList()
-            }
-        }.distinctUntilChanged()
+        if (start in 0..end && end <= list.size) {
+            list.subList(start, end)
+        } else {
+            emptyList()
+        }
+    }.distinctUntilChanged()
