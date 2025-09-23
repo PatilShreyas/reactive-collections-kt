@@ -41,7 +41,7 @@ Every mutation automatically and efficiently emits a new immutable snapshot to i
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("dev.shreyaspatil.reactivecollections:reactive-collections:1.0.0")
+    implementation("dev.shreyaspatil.reactive-collections:reactive-collections-core:1.0.0")
 }
 ```
 
