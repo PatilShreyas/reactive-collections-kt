@@ -24,7 +24,39 @@ import kotlinx.coroutines.flow.map
  * A mutable list that also exposes a [StateFlow] via [asStateFlow], allowing for reactive observation of its contents.
  *
  * It delegates [MutableList] functionality to an internal list and emits an immutable [List] snapshot to its
- * collectors whenever the list is modified.
+ * collectors whenever the list is modified. This enables reactive programming patterns where observers can
+ * automatically respond to changes in the list's contents.
+ *
+ * The interface extends both [MutableReactiveCollection] and [MutableList], providing all standard list operations
+ * while maintaining reactive capabilities. Additional extension functions like [getAsFlow] and [subListAsFlow]
+ * allow for more granular observation of specific elements or ranges.
+ *
+ * Example:
+ * ```kotlin
+ * val todoList = reactiveListOf("Buy groceries", "Walk the dog")
+ *
+ * // Observe all changes to the list
+ * todoList.asStateFlow().collect { todos ->
+ *     println("Todo list updated: $todos")
+ * } // Immediately emits: "Todo list updated: [Buy groceries, Walk the dog]"
+ *
+ * // Observe specific index changes
+ * todoList.getAsFlow(0).collect { firstTodo ->
+ *     println("First todo: $firstTodo")
+ * } // Immediately emits: "First todo: Buy groceries"
+ *
+ * // Perform batch operations to minimize emissions
+ * todoList.batchNotify {
+ *     add("Clean house")
+ *     removeAt(1)
+ *     set(0, "Buy organic groceries")
+ * } // Single emission: "Todo list updated: [Buy organic groceries, Clean house]"
+ *
+ * // Standard list operations work as expected
+ * todoList.add("Exercise")           // Triggers emission
+ * todoList[1] = "Deep clean house"   // Triggers emission
+ * println(todoList.size)             // 3
+ * ```
  *
  * @param E The type of elements contained in the list.
  */
@@ -35,9 +67,35 @@ public interface MutableReactiveList<E> :
 /**
  * Creates a [Flow] that emits the element at the specified [index] whenever the list changes.
  *
- * If the index is out of bounds, it emits `null`. This is useful for observing a specific
- * position in the list without causing an exception if the list shrinks.
+ * This extension function allows you to observe changes to a specific position in the reactive list
+ * without having to observe the entire list. The flow only emits when the element at the specified
+ * index actually changes.
  *
+ * If the index is out of bounds, it emits `null`. This is useful for observing a specific
+ * position in the list without causing an exception if the list shrinks or the index becomes invalid.
+ *
+ * Example:
+ * ```kotlin
+ * val fruits = reactiveListOf("Apple", "Banana", "Cherry")
+ *
+ * // Observe the element at index 1
+ * fruits.getAsFlow(1).collect { fruit ->
+ *     println("Fruit at index 1: $fruit")
+ * } // Immediately emits: "Fruit at index 1: Banana"
+ *
+ * // Observe an out-of-bounds index
+ * fruits.getAsFlow(5).collect { fruit ->
+ *     println("Fruit at index 5: $fruit")
+ * } // Immediately emits: "Fruit at index 5: null"
+ *
+ * // Modify the list
+ * fruits[1] = "Blueberry"     // Emits: "Fruit at index 1: Blueberry"
+ * fruits.add("Dragonfruit")   // No emission for index 1 flow
+ * fruits.removeAt(0)          // Emits: "Fruit at index 1: Cherry" (was at index 2)
+ * fruits.clear()              // Emits: "Fruit at index 1: null"
+ * ```
+ *
+ * @param E The type of elements in the list.
  * @param index The index of the element to observe.
  * @return A [Flow] that emits the element at the given index, or `null` if the index is invalid.
  */
@@ -60,6 +118,36 @@ public fun <E> MutableReactiveList<E>.getAsFlow(index: Int): Flow<E?> = asStateF
  * - Automatically coerces indices to valid ranges using [coerceIn]
  * - Useful when you want to observe "as much as possible" of a range
  *
+ * Example:
+ * ```kotlin
+ * val numbers = reactiveListOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+ *
+ * // Observe elements from index 2 to 5 (exclusive) in strict mode
+ * numbers.subListAsFlow(2, 5, strict = true).collect { sublist ->
+ *     println("Strict sublist [2,5): $sublist")
+ * }
+ *
+ * // Observe the same range in lenient mode
+ * numbers.subListAsFlow(2, 5, strict = false).collect { sublist ->
+ *     println("Lenient sublist [2,5): $sublist")
+ * }
+ *
+ * // Modify the list
+ * delay(1000)
+ * numbers.removeAt(0)
+ * delay(1000)
+ * numbers.retainAll(setOf(2, 3, 4))
+ *
+ * // Flow emissions:
+ * // Lenient sublist [2,5): [2, 3, 4]
+ * // Strict sublist [2,5): [2, 3, 4]
+ * // Strict sublist [2,5): [3, 4, 5]
+ * // Lenient sublist [2,5): [3, 4, 5]
+ * // Strict sublist [2,5): []
+ * // Lenient sublist [2,5): [4]
+ * ```
+ *
+ * @param E The type of elements in the list.
  * @param fromIndex The starting index of the sublist (inclusive).
  * @param toIndex The ending index of the sublist (exclusive).
  * @param strict If `true` (default), an empty list is returned for any invalid indices. This approach avoids exceptions

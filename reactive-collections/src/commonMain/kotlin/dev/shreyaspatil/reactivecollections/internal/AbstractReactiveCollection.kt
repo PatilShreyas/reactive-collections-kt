@@ -57,4 +57,13 @@ internal abstract class AbstractReactiveCollection<E, IC, MC : IC>(
     private fun notifyCollectionChanged() {
         state.value = getImmutableSnapshot()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is AbstractReactiveCollection<*, *, *>) return false
+        return internalCollection?.equals(other.internalCollection) ?: false
+    }
+
+    override fun hashCode(): Int = internalCollection.hashCode()
+
+    override fun toString(): String = internalCollection.toString()
 }

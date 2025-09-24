@@ -21,7 +21,34 @@ import kotlinx.coroutines.flow.StateFlow
  * A mutable set that also exposes a [StateFlow] via [asStateFlow], allowing for reactive observation of its contents.
  *
  * It delegates [MutableSet] functionality to an internal set and emits an immutable [Set] snapshot to its collectors
- * whenever the set is modified.
+ * whenever the set is modified. This enables reactive programming patterns where observers can automatically respond
+ * to changes in the set's contents while maintaining set semantics (no duplicate elements).
+ *
+ * Example:
+ * ```kotlin
+ * val activeUsers = reactiveSetOf("alice", "bob")
+ *
+ * // Observe all changes to the set
+ * activeUsers.asStateFlow().collect { users ->
+ *     println("Active users: $users")
+ * } // Immediately emits: "Active users: [alice, bob]"
+ *
+ * // Standard set operations
+ * activeUsers.add("charlie")    // Triggers emission: [alice, bob, charlie]
+ * activeUsers.add("alice")      // No emission (duplicate element)
+ * activeUsers.remove("bob")     // Triggers emission: [alice, charlie]
+ *
+ * // Batch operations for multiple changes
+ * activeUsers.batchNotify {
+ *     addAll(setOf("david", "eve"))
+ *     remove("alice")
+ * } // Single emission: [charlie, david, eve]
+ *
+ * // Set-specific operations
+ * val otherUsers = setOf("frank", "charlie")
+ * activeUsers.retainAll(otherUsers)  // Triggers emission: [charlie]
+ * println(activeUsers.contains("david"))  // false
+ * ```
  *
  * @param E The type of elements contained in the set.
  */

@@ -44,16 +44,26 @@ public interface MutableReactiveCollection<E, out IC, out MC : IC> {
      * only once after the block has completed.
      *
      * This is useful for performing multiple additions, removals, or other mutations in a single,
-     * atomic operation, preventing multiple emissions from the [StateFlow].
+     * atomic operation, preventing multiple emissions from the [StateFlow]. This is particularly
+     * important for performance when making bulk changes, as it avoids triggering multiple
+     * reactive updates that could cause unnecessary recomputations in observers.
      *
      * Example:
-     * ```
-     * val list = reactiveListOf<String>()
-     * list.batchNotify {
-     *   add("Apple")
-     *   add("Banana")
-     *   remove("OldFruit")
-     * } // Observers are notified only once here.
+     * ```kotlin
+     * val shoppingList = reactiveListOf<String>()
+     *
+     * // Without batch - triggers 3 separate emissions
+     * shoppingList.add("Apple")
+     * shoppingList.add("Banana")
+     * shoppingList.add("Orange")
+     *
+     * // With batch - triggers only 1 emission at the end
+     * shoppingList.batchNotify {
+     *     add("Milk")
+     *     add("Bread")
+     *     removeAt(0) // Remove "Apple"
+     *     set(1, "Blueberries") // Replace "Banana"
+     * } // Observers are notified only once here with final state
      * ```
      *
      * @param block A lambda function with the mutable collection as its receiver, where
@@ -66,7 +76,26 @@ public interface MutableReactiveCollection<E, out IC, out MC : IC> {
      * observers only once after the block has completed.
      *
      * This is the asynchronous equivalent of [batchNotify], suitable for operations that involve
-     * coroutines or other suspending functions.
+     * coroutines or other suspending functions. This is particularly useful when you need to perform
+     * async operations (like network calls or database queries) as part of your collection updates.
+     *
+     * Example:
+     * ```kotlin
+     * val userCache = reactiveMapOf<String, User>()
+     *
+     * // Batch async operations - single emission at the end
+     * userCache.batchNotifyAsync {
+     *     // Simulate async operations
+     *     val user1 = userRepository.fetchUser("alice") // suspending call
+     *     val user2 = userRepository.fetchUser("bob")   // suspending call
+     *
+     *     put("alice", user1)
+     *     put("bob", user2)
+     *     remove("charlie") // Remove cached user
+     *
+     *     delay(100) // Some async processing
+     * } // Observers are notified only once here with all updates
+     * ```
      *
      * @param block A suspending lambda function with the mutable collection as its receiver.
      */
