@@ -49,7 +49,7 @@ public interface MutableReactiveCollection<E, out IC, out MC : IC> {
      * Example:
      * ```
      * val list = reactiveListOf<String>()
-     * list.batchUpdate {
+     * list.batchNotify {
      *   add("Apple")
      *   add("Banana")
      *   remove("OldFruit")
@@ -59,16 +59,16 @@ public interface MutableReactiveCollection<E, out IC, out MC : IC> {
      * @param block A lambda function with the mutable collection as its receiver, where
      * modifications can be performed.
      */
-    public fun batchUpdate(block: MC.() -> Unit)
+    public fun batchNotify(block: MC.() -> Unit)
 
     /**
      * Executes a suspending block of modifications on the underlying mutable collection and notifies
      * observers only once after the block has completed.
      *
-     * This is the asynchronous equivalent of [batchUpdate], suitable for operations that involve
+     * This is the asynchronous equivalent of [batchNotify], suitable for operations that involve
      * coroutines or other suspending functions.
      *
      * @param block A suspending lambda function with the mutable collection as its receiver.
      */
-    public suspend fun batchUpdateAsync(block: suspend MC.() -> Unit)
+    public suspend fun batchNotifyAsync(block: suspend MC.() -> Unit)
 }

@@ -34,11 +34,11 @@ internal abstract class AbstractReactiveCollection<E, IC, MC : IC>(
 
     override fun asStateFlow(): StateFlow<IC> = state.asStateFlow()
 
-    override fun batchUpdate(block: MC.() -> Unit) {
+    override fun batchNotify(block: MC.() -> Unit) {
         runNotifying { block() }
     }
 
-    override suspend fun batchUpdateAsync(block: suspend MC.() -> Unit) {
+    override suspend fun batchNotifyAsync(block: suspend MC.() -> Unit) {
         runNotifying { block() }
     }
 

@@ -119,14 +119,14 @@ list.add("E")
 list.removeAt(0)
 
 // With batch - triggers only 1 emission
-list.batchUpdate {
+list.batchNotify {
     add("D")
     add("E")
     removeAt(0)
 }
 
 // Async batch operations for suspending functions
-list.batchUpdateAsync {
+list.batchNotifyAsync {
     // Suspending operations
     delay(100)
     add("F")
@@ -194,7 +194,7 @@ class TodoViewModel : ViewModel() {
     }
     
     fun updateTodos(updates: List<Todo>) {
-        _todos.batchUpdate {
+        _todos.batchNotify {
             clear()
             addAll(updates)
         }
@@ -215,7 +215,7 @@ class DataRepository {
     
     suspend fun syncUsers() {
         val users = api.fetchUsers()
-        _cache.batchUpdate {
+        _cache.batchNotify {
             clear()
             users.forEach { user -> put(user.id, user) }
         }
@@ -241,7 +241,7 @@ process automatically under the hood, giving you a much cleaner and more direct 
 
 This depends on the size of data which is going to be used within collection. For each mutation, the library creates a 
 new immutable snapshot (`toList()`, `toSet()`, `toMap()`, etc.) to emit. For most lightweight workloads, this is 
-negligible. For high-frequency, bulk operations, you should use the `batchUpdate` function to ensure only one snapshot 
+negligible. For high-frequency, bulk operations, you should use the `batchNotify` function to ensure only one snapshot 
 is created after all mutations are complete.
 
 ### 3. Is it thread-safe?

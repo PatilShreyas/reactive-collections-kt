@@ -27,11 +27,11 @@ import kotlin.test.assertTrue
  */
 class AbstractReactiveCollectionTest {
     @Test
-    fun `batchUpdate - should perform multiple operations in single emission`() {
+    fun `batchNotify - should perform multiple operations in single emission`() {
         val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
 
         testFlow(list.asStateFlow()) {
-            list.batchUpdate {
+            list.batchNotify {
                 add("D")
                 add("E")
                 removeAt(0) // Remove "A"
@@ -44,23 +44,23 @@ class AbstractReactiveCollectionTest {
     }
 
     @Test
-    fun `batchUpdate - should emit only once for empty batch`() {
+    fun `batchNotify - should emit only once for empty batch`() {
         val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
 
         testFlow(list.asStateFlow()) {
-            list.batchUpdate {
+            list.batchNotify {
                 // Empty batch - no operations
             }
         }.emitsExactly(listOf("A", "B", "C"))
     }
 
     @Test
-    fun `batchUpdate - should handle exceptions and still emit`() {
+    fun `batchNotify - should handle exceptions and still emit`() {
         val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
 
         testFlow(list.asStateFlow()) {
             runCatching {
-                list.batchUpdate {
+                list.batchNotify {
                     add("D")
                     removeAt(10) // This will throw IndexOutOfBoundsException
                 }
@@ -72,11 +72,11 @@ class AbstractReactiveCollectionTest {
     }
 
     @Test
-    fun `batchUpdateAsync - should perform multiple operations in single emission`() = runTest {
+    fun `batchNotifyAsync - should perform multiple operations in single emission`() = runTest {
         val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
 
         testFlow(list.asStateFlow()) {
-            list.batchUpdateAsync {
+            list.batchNotifyAsync {
                 add("D")
                 add("E")
                 delay(1000)
@@ -90,11 +90,11 @@ class AbstractReactiveCollectionTest {
     }
 
     @Test
-    fun `batchUpdateAsync - should emit only once for empty batch`() = runTest {
+    fun `batchNotifyAsync - should emit only once for empty batch`() = runTest {
         val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
 
         testFlow(list.asStateFlow()) {
-            list.batchUpdateAsync {
+            list.batchNotifyAsync {
                 delay(1000)
                 // Empty batch - no operations
             }
@@ -102,12 +102,12 @@ class AbstractReactiveCollectionTest {
     }
 
     @Test
-    fun `batchUpdateAsync - should handle exceptions and still emit`() = runTest {
+    fun `batchNotifyAsync - should handle exceptions and still emit`() = runTest {
         val list = ReactiveListImpl(mutableListOf("A", "B", "C"))
 
         testFlow(list.asStateFlow()) {
             runCatching {
-                list.batchUpdateAsync {
+                list.batchNotifyAsync {
                     add("D")
                     removeAt(10) // This will throw IndexOutOfBoundsException
                 }
@@ -119,13 +119,13 @@ class AbstractReactiveCollectionTest {
     }
 
     @Test
-    fun `nested batchUpdate - should work correctly`() {
+    fun `nested batchNotify - should work correctly`() {
         val list = ReactiveListImpl(mutableListOf("A"))
 
         testFlow(list.asStateFlow()) {
-            list.batchUpdate {
+            list.batchNotify {
                 add("B")
-                list.batchUpdate {
+                list.batchNotify {
                     add("C")
                     add("D")
                 }
