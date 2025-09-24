@@ -6,6 +6,10 @@
 Transform your regular `List`, `Set`, and `Map` into reactive data structures that emit updates through Kotlin Flows 
 whenever their content changes.
 
+[![Build](https://github.com/PatilShreyas/reactive-collections-kt/actions/workflows/build.yml/badge.svg)](https://github.com/PatilShreyas/reactive-collections-kt/actions/workflows/build.yml)
+[![Release](https://github.com/PatilShreyas/reactive-collections-kt/actions/workflows/publish.yml/badge.svg)](https://github.com/PatilShreyas/reactive-collections-kt/actions/workflows/publish.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.shreyaspatil.reactive-collections/reactive-collections-core)](https://search.maven.org/artifact/dev.shreyaspatil.reactive-collections/reactive-collections-core)
+
 ## 🤔 The Core Idea
 
 In modern reactive programming, we often find ourselves needing to observe changes to a list or map. The common 
@@ -39,7 +43,6 @@ Every mutation automatically and efficiently emits a new immutable snapshot to i
 ### 📦 Installation
 
 ```kotlin
-// build.gradle.kts
 dependencies {
     implementation("dev.shreyaspatil.reactive-collections:reactive-collections-core:1.0.0")
 }
